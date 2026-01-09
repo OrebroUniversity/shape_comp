@@ -26,15 +26,37 @@ pip install torch-scatter==2.0.9 -f https://data.pyg.org/whl/torch-1.11.0+cu113.
 python -c "import torch; print(torch.cuda.is_available())"
 ```
 
-## Running inference
-Inference will be run on the partial point cloud `can_partial.ply` that was extracted from `scene_pcd.ply`, both of which are in the `example` directory.
+(Setup was verified to work on Ubuntu 22.04, NVIDIA driver `570.195.03`, and `nvcc` version `12.3`)
 
-Inside the conda environment:
+## Running inference
+Inference will be run with the checkpoint `shape_comp.ckpt` which has the model weights for the following object categories (refer to `Table 1` in the paper):
+- `apple`
+- `bottle`
+- `bowl`
+- `box`
+- `can`
+- `hammer`
+
+NOTE: adjust `mesh_create_batch_size` in `inference.py` based on available GPU memory
+
+### With provided example
+
+An example partial point cloud `can_partial.ply` can be found in `example` directory along with scene it was extracted from (`scene_pcd.ply`).
+
+Inside the conda environment, execute:
 ```bash
 python inference.py
 ```
 
 This will produce `can_completed.ply`.
+
+### With your own data
+Start with a segmented point cloud of an object and modify the following lines in `inference.py`:
+1. Update `obj_name: str` to the object category whose geometry most closely resembles your segmented point cloud.
+2. Update `partial_pcd_fp: str` to the filepath of the segmented point cloud (expected extension is `.ply`).
+
+Run `inference.py` to obtain the estimated completed shape as `{obj_name}_completed.ply`.
+
 
 # Reference
 - [Diffusion-SDF](https://github.com/princeton-computational-imaging/Diffusion-SDF): Conditional Generative Modeling of Signed Distance Functions
